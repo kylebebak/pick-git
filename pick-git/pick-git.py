@@ -6,7 +6,6 @@ from .helpers import (cd_repository_root, current_branch, pick_branch, pick_comm
                       pick_commit_reflog, pick_file, pick_modified_file,)
 
 
-# if pyperclip doesn't work, `copy` is initialized to a NOOP
 try:
     pyperclip.copy('')
     _copy = pyperclip.copy
@@ -14,9 +13,17 @@ except pyperclip.exceptions.PyperclipException:
     _copy = lambda text: None
 
 def copy(s):
+    """Copy `s` using `_copy`, which is `pyperclip.copy`, or a NOOP if
+    `pyperclip` doesn't work.
+    """
     _copy(s.decode('utf-8') if type(s) is bytes else s)
 
 def execute(command):
+    """Make sure `command` is a string, and execute it using the shell specified
+    by the $SHELL env var, or by the default shell if $SHELL isn't defined.
+
+    Print `command` for logging purposes.
+    """
     if not isinstance(command, str):
         command = ' '.join(command)
     print(command)
@@ -31,6 +38,8 @@ def execute(command):
 
 
 def branch(*args):
+    """Pick a branch and pass it to `args`, or copy the branch name.
+    """
     branch = pick_branch()
     if not args:
         copy(branch)
@@ -38,6 +47,9 @@ def branch(*args):
         execute(args + tuple(branch))
 
 def branch_file(show=False):
+    """Pick a branch, diff files with HEAD, pick one of these files and diff or
+    `show` it.
+    """
     cd_repository_root()
     branch = pick_branch()
     file = pick_modified_file(branch)
@@ -48,8 +60,11 @@ def branch_file(show=False):
         execute(['git', 'diff', '{} -- {}'.format(branch, file)])
 
 def branch_compare(both=False, detailed=False):
-    that = pick_branch()
+    """Find out how far ahead or behind `this` branch is compared with `that`. A
+    `detailed` comparison shows all commits instead of just the commit count.
+    """
     this = pick_branch() if both else current_branch()
+    that = pick_branch()
     if detailed:
         execute('git log --stat {that}..{this} && git log --stat {this}..{that}'.format(
                 this=this, that=that))
@@ -58,6 +73,8 @@ def branch_compare(both=False, detailed=False):
 
 
 def commit(*args):
+    """Pick a commit and pass it to `args`, or copy the commit hash.
+    """
     commit = pick_commit()
     if not args:
         copy(commit)
@@ -65,6 +82,9 @@ def commit(*args):
         execute(args + tuple(commit))
 
 def commit_file(show=False):
+    """Pick a commit, diff files with HEAD, pick one of these files and diff or
+    `show` it.
+    """
     cd_repository_root()
     commit = pick_commit()
     file = pick_modified_file(commit)
@@ -75,6 +95,8 @@ def commit_file(show=False):
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
 
 def commit_reflog(*args):
+    """Pick a commit from the reflog pass it to `args`, or copy the commit hash.
+    """
     commit = pick_commit_reflog()
     if not args:
         copy(commit)
@@ -82,6 +104,9 @@ def commit_reflog(*args):
         execute(args + tuple(commit))
 
 def commit_reflog_file(show=False):
+    """Pick a commit from the reflog, diff files with HEAD, pick one of these
+    files and diff or `show` it.
+    """
     cd_repository_root()
     commit = pick_commit_reflog()
     file = pick_modified_file(commit)
@@ -92,8 +117,19 @@ def commit_reflog_file(show=False):
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
 
 
-def file_commit():
-    pass
+def file_commit(show=False):
+    """Pick a file from index, and show all commits for this file. Pick a commit
+    and diff file against HEAD or `show` it.
+    """
+    cd_repository_root()
+    file = pick_file()
+    copy(file)
+    commit = pick_commit('--follow', '--', file)
+    if show:
+        execute(['git', 'show', '{}:{}'.format(commit, file)])
+    else:
+        execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
+
 
 if __name__ == '__main__':
-    branch_compare(detailed=True)
+    file_commit()
