@@ -1,10 +1,27 @@
 from os import getenv
 from subprocess import Popen
+from functools import wraps
+
 import pyperclip
 
 from .helpers import (cd_repository_root, current_branch, pick_branch, pick_commit,
                       pick_commit_reflog, pick_file, pick_modified_file,)
 
+
+shell, rcfile = ('', '')
+
+def set_shell_globals(f):
+    """Decorator that parses `shell` and `rcfile` kwargs and sets them as global
+    variables.
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        global shell
+        global rcfile
+        shell = kwargs.pop('shell', '')
+        rcfile = kwargs.pop('rcfile', '')
+        return f(*args, **kwargs)
+    return wrapper
 
 try:
     pyperclip.copy('')
@@ -19,24 +36,28 @@ def copy(s):
     _copy(s.decode('utf-8') if type(s) is bytes else s)
 
 def execute(command):
-    """Make sure `command` is a string, and execute it using the shell specified
-    by the $SHELL env var, or by the default shell if $SHELL isn't defined.
+    """Make sure `command` is a string, and execute it using the global `shell`
+    var, the shell specified by the $SHELL env var, or by the default shell.
 
-    Print `command` for logging purposes.
+    Also prints `command`.
     """
     if not isinstance(command, str):
         command = ' '.join(command)
     print(command)
 
-    shell = getenv('SHELL')
+    global shell
+    global rcfile
+    shell = shell or getenv('SHELL')
+    rcfile = ['--rcfile', rcfile] if rcfile else []
     if shell:
-        p = Popen([shell, '-i', '-c', command])
+        p = Popen([shell] + rcfile + ['-i', '-c', command])
         p.communicate()
     else:
         p = Popen(command)
         p.communicate()
 
 
+@set_shell_globals
 def branch(*args, **kwargs):
     """Pick a branch and pass it to `args`, or copy the branch name.
     """
@@ -46,10 +67,12 @@ def branch(*args, **kwargs):
     else:
         execute(args + (branch,))
 
-def branch_file(*args, show=False, **kwargs):
+@set_shell_globals
+def branch_file(*args, **kwargs):
     """Pick a branch, diff files with HEAD, pick one of these files and diff or
     `show` it.
     """
+    show = kwargs.pop('show', False)
     cd_repository_root()
     branch = pick_branch()
     file = pick_modified_file(branch)
@@ -59,10 +82,13 @@ def branch_file(*args, show=False, **kwargs):
     else:
         execute(['git', 'diff', '{} -- {}'.format(branch, file)])
 
-def branch_compare(*args, both=False, detailed=False, **kwargs):
+@set_shell_globals
+def branch_compare(*args, **kwargs):
     """Find out how far ahead or behind `this` branch is compared with `that`. A
     `detailed` comparison shows all commits instead of just the commit count.
     """
+    both = kwargs.pop('both', False)
+    detailed = kwargs.pop('detailed', False)
     this = pick_branch() if both else current_branch()
     that = pick_branch()
     if detailed:
@@ -72,6 +98,7 @@ def branch_compare(*args, both=False, detailed=False, **kwargs):
         execute('git rev-list --left-right --count {}...{}'.format(this, that))
 
 
+@set_shell_globals
 def commit(*args, **kwargs):
     """Pick a commit and pass it to `args`, or copy the commit hash.
     """
@@ -81,10 +108,12 @@ def commit(*args, **kwargs):
     else:
         execute(args + (commit,))
 
-def commit_file(*args, show=False, **kwargs):
+@set_shell_globals
+def commit_file(*args, **kwargs):
     """Pick a commit, diff files with HEAD, pick one of these files and diff or
     `show` it.
     """
+    show = kwargs.pop('show', False)
     cd_repository_root()
     commit = pick_commit()
     file = pick_modified_file(commit)
@@ -94,6 +123,7 @@ def commit_file(*args, show=False, **kwargs):
     else:
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
 
+@set_shell_globals
 def commit_reflog(*args, **kwargs):
     """Pick a commit from the reflog pass it to `args`, or copy the commit hash.
     """
@@ -103,10 +133,12 @@ def commit_reflog(*args, **kwargs):
     else:
         execute(args + (commit,))
 
-def commit_reflog_file(*args, show=False, **kwargs):
+@set_shell_globals
+def commit_reflog_file(*args, **kwargs):
     """Pick a commit from the reflog, diff files with HEAD, pick one of these
     files and diff or `show` it.
     """
+    show = kwargs.pop('show', False)
     cd_repository_root()
     commit = pick_commit_reflog()
     file = pick_modified_file(commit)
@@ -117,10 +149,12 @@ def commit_reflog_file(*args, show=False, **kwargs):
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
 
 
-def file_commit(*args, show=False, **kwargs):
+@set_shell_globals
+def file_commit(*args, **kwargs):
     """Pick a file from index, and show all commits for this file. Pick a commit
     and diff file against HEAD or `show` it.
     """
+    show = kwargs.pop('show', False)
     cd_repository_root()
     file = pick_file()
     copy(file)
