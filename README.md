@@ -1,4 +1,4 @@
-# my_sample
+# pick-git
 
 __pick-git__ is a cross-platform set of tools for leveraging [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
 
