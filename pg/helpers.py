@@ -38,10 +38,13 @@ def exit_on_keyboard_interrupt(f):
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
+        raise_exception = kwargs.pop('raise_exception', False)
         try:
             return f(*args, **kwargs)
         except KeyboardInterrupt:
-            sys.exit()
+            if not raise_exception:
+                sys.exit()
+            raise KeyboardInterrupt
     return wrapper
 
 @exit_on_keyboard_interrupt

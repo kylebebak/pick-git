@@ -2,14 +2,25 @@ from os import getenv
 from subprocess import Popen
 from functools import wraps
 
-import pyperclip
-
 from .helpers import (cd_repository_root, current_branch, pick_branch, pick_commit,
                       pick_commit_reflog, pick_file, pick_modified_file,)
 
+# import pyperclip if it's installed, use `pyperclip.copy` if it works
+_copy = lambda text: None
+try:
+    import pyperclip
+except ImportError:
+    print('Install pyperclip for a better experience')
+else:
+    try:
+        pyperclip.copy('')
+    except pyperclip.exceptions.PyperclipException:
+        print("pyperclip is installed but it's missing a dependency, see pyperclip repo for details")
+    else:
+        _copy = pyperclip.copy
+
 
 shell, rcfile = ('', '')
-
 def set_shell_globals(f):
     """Decorator that parses `shell` and `rcfile` kwargs and sets them as global
     variables.
@@ -22,12 +33,6 @@ def set_shell_globals(f):
         rcfile = kwargs.pop('rcfile', '')
         return f(*args, **kwargs)
     return wrapper
-
-try:
-    pyperclip.copy('')
-    _copy = pyperclip.copy
-except pyperclip.exceptions.PyperclipException:
-    _copy = lambda text: None
 
 def copy(s):
     """Copy `s` using `_copy`, which is `pyperclip.copy`, or a NOOP if
@@ -159,7 +164,11 @@ def file_commit(*args, **kwargs):
     file = pick_file()
     copy(file)
     commit = pick_commit('--follow', '--', file)
+    try:
+        other_file = pick_modified_file(commit, raise_exception=True)
+    except KeyboardInterrupt:
+        other_file = file
     if show:
         execute(['git', 'show', '{}:{}'.format(commit, file)])
     else:
-        execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
+        execute(['git', 'diff', '{} -M25 -- {} {}'.format(commit, file, other_file)])
