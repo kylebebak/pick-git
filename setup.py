@@ -3,9 +3,9 @@ from setuptools import setup
 setup(
     name='pick-git',
     version='0.1.0',
-    description='Use pick by thoughtbot to transform the way you use Git',
+    description="Use thoughtbot's pick to turbocharge your Git workflow",
     long_description='Check it out on GitHub',
-    keywords='pick git thoughtbot fuzzy select terminal',
+    keywords='pick git thoughtbot fuzzy select terminal productivity',
     url='https://github.com/kylebebak/pick-git',
     download_url = 'https://github.com/kylebebak/pick-git/tarball/0.1.0',
     author='kylebebak',

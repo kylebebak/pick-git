@@ -10,7 +10,7 @@ _copy = lambda text: None
 try:
     import pyperclip
 except ImportError:
-    print('Install pyperclip for a better experience')
+    print('install pyperclip for a better experience')
 else:
     try:
         pyperclip.copy('')

@@ -1,4 +1,4 @@
-import argparse, sys
+import subprocess, argparse, sys
 
 from pg.pg import (branch, branch_file, branch_compare, commit, commit_file,
                    commit_reflog, commit_reflog_file, file_commit,)
@@ -30,9 +30,12 @@ if __name__ == '__main__':
     kwargs = {name: args.__getattribute__(name) for name in [
         'show', 'both', 'detailed', 'shell', 'rcfile',
     ]}
+    if not subprocess.call(['which', 'pick']) == 0:
+        print("pick isn't installed! exiting...")
+        sys.exit()
     try:
         f = functions[args.function]
     except KeyError as e:
-        print('{} is not a registered pick-git function'.format(e))
+        print('{} is not a registered pick-git function, exiting'.format(e))
         sys.exit()
     f(*args.args, **kwargs)
