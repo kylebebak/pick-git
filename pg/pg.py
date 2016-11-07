@@ -129,7 +129,3 @@ def file_commit(show=False):
         execute(['git', 'show', '{}:{}'.format(commit, file)])
     else:
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
-
-
-if __name__ == '__main__':
-    file_commit()
