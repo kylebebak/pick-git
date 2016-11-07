@@ -37,16 +37,16 @@ def execute(command):
         p.communicate()
 
 
-def branch(*args):
+def branch(*args, **kwargs):
     """Pick a branch and pass it to `args`, or copy the branch name.
     """
     branch = pick_branch()
     if not args:
         copy(branch)
     else:
-        execute(args + tuple(branch))
+        execute(args + (branch,))
 
-def branch_file(show=False):
+def branch_file(*args, show=False, **kwargs):
     """Pick a branch, diff files with HEAD, pick one of these files and diff or
     `show` it.
     """
@@ -59,7 +59,7 @@ def branch_file(show=False):
     else:
         execute(['git', 'diff', '{} -- {}'.format(branch, file)])
 
-def branch_compare(both=False, detailed=False):
+def branch_compare(*args, both=False, detailed=False, **kwargs):
     """Find out how far ahead or behind `this` branch is compared with `that`. A
     `detailed` comparison shows all commits instead of just the commit count.
     """
@@ -72,16 +72,16 @@ def branch_compare(both=False, detailed=False):
         execute('git rev-list --left-right --count {}...{}'.format(this, that))
 
 
-def commit(*args):
+def commit(*args, **kwargs):
     """Pick a commit and pass it to `args`, or copy the commit hash.
     """
     commit = pick_commit()
     if not args:
         copy(commit)
     else:
-        execute(args + tuple(commit))
+        execute(args + (commit,))
 
-def commit_file(show=False):
+def commit_file(*args, show=False, **kwargs):
     """Pick a commit, diff files with HEAD, pick one of these files and diff or
     `show` it.
     """
@@ -94,16 +94,16 @@ def commit_file(show=False):
     else:
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
 
-def commit_reflog(*args):
+def commit_reflog(*args, **kwargs):
     """Pick a commit from the reflog pass it to `args`, or copy the commit hash.
     """
     commit = pick_commit_reflog()
     if not args:
         copy(commit)
     else:
-        execute(args + tuple(commit))
+        execute(args + (commit,))
 
-def commit_reflog_file(show=False):
+def commit_reflog_file(*args, show=False, **kwargs):
     """Pick a commit from the reflog, diff files with HEAD, pick one of these
     files and diff or `show` it.
     """
@@ -117,7 +117,7 @@ def commit_reflog_file(show=False):
         execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
 
 
-def file_commit(show=False):
+def file_commit(*args, show=False, **kwargs):
     """Pick a file from index, and show all commits for this file. Pick a commit
     and diff file against HEAD or `show` it.
     """
