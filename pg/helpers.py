@@ -94,33 +94,35 @@ def pick_file(*args):
 
 
 class PGMethodMixin(object):
-    def branch(self, *args, **kwargs):
-        """Pick a branch and pass it to `args`, or copy the branch name.
+    def _pick_both(self, *args, **kwargs):
+        """Helper that invokes a pick helper `function` one or two times, and
+        passes the string `git_entities` to `args`.
         """
-        this = pick_branch()
-        # that = pick_branch() if kwargs.pop('both', False) else None
+        function = kwargs.pop('function')
+        git_entities = [function(), function() if kwargs.pop('both', False) else None]
+        if not git_entities[1]:
+            git_entities.pop()
         if not args:
-            self.copy(this)
+            self.copy(', '.join(git_entities))
         else:
-            self.execute(args + (this,))
+            self.execute(args + tuple(git_entities))
+
+    def branch(self, *args, **kwargs):
+        """Pick branch(es) and pass them to `args`, or copy branch names.
+        """
+        self._pick_both(*args, function=pick_branch, **kwargs)
 
     def commit(self, *args, **kwargs):
-        """Pick a commit and pass it to `args`, or copy the commit hash.
+        """Pick a commit hash(es) and pass them to `args`, or copy commit hash
+        names.
         """
-        commit = pick_commit()
-        if not args:
-            self.copy(commit)
-        else:
-            self.execute(args + (commit,))
+        self._pick_both(*args, function=pick_commit, **kwargs)
 
     def commit_reflog(self, *args, **kwargs):
-        """Pick a commit from the reflog pass it to `args`, or copy the commit hash.
+        """Pick commit hash(es) from the reflog and pass them to `args`, or copy
+        commit hash names.
         """
-        commit = pick_commit_reflog()
-        if not args:
-            self.copy(commit)
-        else:
-            self.execute(args + (commit,))
+        self._pick_both(*args, function=pick_commit_reflog, **kwargs)
 
 
     def branch_compare(self, *args, **kwargs):
