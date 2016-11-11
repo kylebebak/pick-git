@@ -30,20 +30,16 @@ class PG(PGMethodMixin):
         """
         self._copy(s.decode('utf-8') if type(s) is bytes else s)
 
-    def execute(self, command):
-        """Make sure `command` is a string, and execute it using the global `shell`
-        var, the shell specified by the $SHELL env var, or by the default shell.
-
-        Also prints `command`.
+    def execute(self, *commands):
+        """Convert `commands` to a string, and execute them using the global
+        `shell` var, the shell specified by the $SHELL env var, or by the default
+        shell.
         """
-        if not isinstance(command, str):
-            command = ' '.join(command)
-        print(command)
-
+        commands = ' '.join(commands); print(commands)
         rcfile = ['--rcfile', self.rcfile] if self.rcfile else []
         if self.shell:
-            p = Popen([self.shell] + rcfile + ['-i', '-c', command])
+            p = Popen([self.shell] + rcfile + ['-i', '-c', commands])
             p.communicate()
         else:
-            p = Popen(command)
+            p = Popen(commands)
             p.communicate()

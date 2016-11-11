@@ -76,11 +76,12 @@ def pick_commit_reflog(*args):
     return commit.split()[0].decode('utf-8')
 
 @exit_on_keyboard_interrupt
-def pick_modified_file(branch_or_commit):
-    """Pick a file whose state in another branch or a previous commit has
-    changed with respect to its state in HEAD.
+def pick_modified_file(*args):
+    """Pick a file whose state differs between two branches or commits, which are
+    passed in `args`. If `args` contains only one branch or commit, this is
+    compared against HEAD.
     """
-    files = subprocess.Popen(['git', 'diff', '--name-only', branch_or_commit], stdout=PIPE)
+    files = subprocess.Popen(('git', 'diff', '--name-only',) + args, stdout=PIPE)
     file = subprocess.check_output(['pick'], stdin=files.stdout)
     return file.strip().decode('utf-8')
 
@@ -105,7 +106,7 @@ class PGMethodMixin(object):
         if not args:
             self.copy(', '.join(git_entities))
         else:
-            self.execute(args + tuple(git_entities))
+            self.execute(*(args + tuple(git_entities)))
 
     def branch(self, *args, **kwargs):
         """Pick branch(es) and pass them to `args`, or copy branch names.
@@ -125,6 +126,49 @@ class PGMethodMixin(object):
         self._pick_both(*args, function=pick_commit_reflog, **kwargs)
 
 
+    def branch_file(self, *args, **kwargs):
+        """Pick a branch, diff files with HEAD, pick one of these files and diff or
+        `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        branch = pick_branch()
+        file = pick_modified_file(branch)
+        self.copy(file)
+        if show:
+            self.execute('git', 'show', '{}:{}'.format(branch, file))
+        else:
+            self.execute('git', 'diff', '{} -- {}'.format(branch, file))
+
+    def commit_file(self, *args, **kwargs):
+        """Pick a commit, diff files with HEAD, pick one of these files and diff or
+        `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        commit = pick_commit()
+        file = pick_modified_file(commit)
+        self.copy(file)
+        if show:
+            self.execute('git', 'show', '{}:{}'.format(commit, file))
+        else:
+            self.execute('git', 'diff', '{}:{} {}'.format(commit, file, file))
+
+    def commit_reflog_file(self, *args, **kwargs):
+        """Pick a commit from the reflog, diff files with HEAD, pick one of these
+        files and diff or `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        commit = pick_commit_reflog()
+        file = pick_modified_file(commit)
+        self.copy(file)
+        if show:
+            self.execute('git', 'show', '{}:{}'.format(commit, file))
+        else:
+            self.execute('git', 'diff', '{}:{} {}'.format(commit, file, file))
+
+
     def branch_compare(self, *args, **kwargs):
         """Find out how far ahead or behind `this` branch is compared with `that`. A
         `detailed` comparison shows all commits instead of just the commit count.
@@ -140,48 +184,6 @@ class PGMethodMixin(object):
             self.execute('git rev-list --left-right --count {}...{}'.format(this, that))
 
 
-    def branch_file(self, *args, **kwargs):
-        """Pick a branch, diff files with HEAD, pick one of these files and diff or
-        `show` it.
-        """
-        show = kwargs.pop('show', False)
-        cd_repository_root()
-        branch = pick_branch()
-        file = pick_modified_file(branch)
-        self.copy(file)
-        if show:
-            self.execute(['git', 'show', '{}:{}'.format(branch, file)])
-        else:
-            self.execute(['git', 'diff', '{} -- {}'.format(branch, file)])
-
-    def commit_file(self, *args, **kwargs):
-        """Pick a commit, diff files with HEAD, pick one of these files and diff or
-        `show` it.
-        """
-        show = kwargs.pop('show', False)
-        cd_repository_root()
-        commit = pick_commit()
-        file = pick_modified_file(commit)
-        self.copy(file)
-        if show:
-            self.execute(['git', 'show', '{}:{}'.format(commit, file)])
-        else:
-            self.execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
-
-    def commit_reflog_file(self, *args, **kwargs):
-        """Pick a commit from the reflog, diff files with HEAD, pick one of these
-        files and diff or `show` it.
-        """
-        show = kwargs.pop('show', False)
-        cd_repository_root()
-        commit = pick_commit_reflog()
-        file = pick_modified_file(commit)
-        self.copy(file)
-        if show:
-            self.execute(['git', 'show', '{}:{}'.format(commit, file)])
-        else:
-            self.execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
-
     def file_commit(self, *args, **kwargs):
         """Pick a file from index, and show all commits for this file. Pick a commit
         and diff file against HEAD or `show` it.
@@ -196,6 +198,6 @@ class PGMethodMixin(object):
         except KeyboardInterrupt:
             other_file = file
         if show:
-            self.execute(['git', 'show', '{}:{}'.format(commit, file)])
+            self.execute('git', 'show', '{}:{}'.format(commit, file))
         else:
-            self.execute(['git', 'diff', '{} -M25 -- {} {}'.format(commit, file, other_file)])
+            self.execute('git', 'diff', '{} -M25 -- {} {}'.format(commit, file, other_file))
