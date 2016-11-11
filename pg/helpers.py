@@ -91,3 +91,109 @@ def pick_file(*args):
     files = subprocess.Popen(('git', 'ls-tree', '-r', 'master', '--name-only') + args, stdout=PIPE)
     file = subprocess.check_output(['pick'], stdin=files.stdout)
     return file.strip().decode('utf-8')
+
+
+class PGMethodMixin(object):
+    def branch(self, *args, **kwargs):
+        """Pick a branch and pass it to `args`, or copy the branch name.
+        """
+        this = pick_branch()
+        # that = pick_branch() if kwargs.pop('both', False) else None
+        if not args:
+            self.copy(this)
+        else:
+            self.execute(args + (this,))
+
+    def commit(self, *args, **kwargs):
+        """Pick a commit and pass it to `args`, or copy the commit hash.
+        """
+        commit = pick_commit()
+        if not args:
+            self.copy(commit)
+        else:
+            self.execute(args + (commit,))
+
+    def commit_reflog(self, *args, **kwargs):
+        """Pick a commit from the reflog pass it to `args`, or copy the commit hash.
+        """
+        commit = pick_commit_reflog()
+        if not args:
+            self.copy(commit)
+        else:
+            self.execute(args + (commit,))
+
+
+    def branch_compare(self, *args, **kwargs):
+        """Find out how far ahead or behind `this` branch is compared with `that`. A
+        `detailed` comparison shows all commits instead of just the commit count.
+        """
+        both = kwargs.pop('both', False)
+        detailed = kwargs.pop('detailed', False)
+        this = pick_branch() if both else current_branch()
+        that = pick_branch()
+        if detailed:
+            self.execute('git log --stat {that}..{this} && git log --stat {this}..{that}'.format(
+                    this=this, that=that))
+        else:
+            self.execute('git rev-list --left-right --count {}...{}'.format(this, that))
+
+
+    def branch_file(self, *args, **kwargs):
+        """Pick a branch, diff files with HEAD, pick one of these files and diff or
+        `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        branch = pick_branch()
+        file = pick_modified_file(branch)
+        self.copy(file)
+        if show:
+            self.execute(['git', 'show', '{}:{}'.format(branch, file)])
+        else:
+            self.execute(['git', 'diff', '{} -- {}'.format(branch, file)])
+
+    def commit_file(self, *args, **kwargs):
+        """Pick a commit, diff files with HEAD, pick one of these files and diff or
+        `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        commit = pick_commit()
+        file = pick_modified_file(commit)
+        self.copy(file)
+        if show:
+            self.execute(['git', 'show', '{}:{}'.format(commit, file)])
+        else:
+            self.execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
+
+    def commit_reflog_file(self, *args, **kwargs):
+        """Pick a commit from the reflog, diff files with HEAD, pick one of these
+        files and diff or `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        commit = pick_commit_reflog()
+        file = pick_modified_file(commit)
+        self.copy(file)
+        if show:
+            self.execute(['git', 'show', '{}:{}'.format(commit, file)])
+        else:
+            self.execute(['git', 'diff', '{}:{} {}'.format(commit, file, file)])
+
+    def file_commit(self, *args, **kwargs):
+        """Pick a file from index, and show all commits for this file. Pick a commit
+        and diff file against HEAD or `show` it.
+        """
+        show = kwargs.pop('show', False)
+        cd_repository_root()
+        file = pick_file()
+        self.copy(file)
+        commit = pick_commit('--follow', '--', file)
+        try:
+            other_file = pick_modified_file(commit, raise_exception=True)
+        except KeyboardInterrupt:
+            other_file = file
+        if show:
+            self.execute(['git', 'show', '{}:{}'.format(commit, file)])
+        else:
+            self.execute(['git', 'diff', '{} -M25 -- {} {}'.format(commit, file, other_file)])

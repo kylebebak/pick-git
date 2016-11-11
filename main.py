@@ -1,20 +1,15 @@
 import subprocess, argparse, sys
 
-from pg.pg import (branch, branch_file, branch_compare, commit, commit_file,
-                   commit_reflog, commit_reflog_file, file_commit,)
+from pg.pg import PG
 
-
-functions = {f.__name__: f for f in [
-    branch, branch_file, branch_compare, commit, commit_file,
-    commit_reflog, commit_reflog_file, file_commit
-]}
 
 parser = argparse.ArgumentParser(description='Invoke a pick-git function.')
 
-parser.add_argument('--show', action='store_true',
+parser.add_argument('-b', '--both', action='store_true',
+                    help='pick both branches, commits, or files, where appropriate')
+parser.add_argument('-s', '--show', action='store_true',
                     help='show file instead of diffing it, where appropriate')
-parser.add_argument('--both', action='store_true',
-                    help='pick both branches or files, where appropriate')
+
 parser.add_argument('--detailed', action='store_true',
                     help='show detail of commits instead of just count, where appropriate')
 parser.add_argument('--shell',
@@ -33,9 +28,9 @@ if __name__ == '__main__':
     if not subprocess.call(['which', 'pick']) == 0:
         print("pick isn't installed! exiting...")
         sys.exit()
+    pg = PG(**kwargs)
     try:
-        f = functions[args.function]
-    except KeyError as e:
-        print('{} is not a registered pick-git function, exiting'.format(e))
+        f = pg.__getattribute__(args.function)(*args.args, **kwargs)
+    except AttributeError as e:
+        print('{} is not a valid pick-git function, exiting'.format(e))
         sys.exit()
-    f(*args.args, **kwargs)
