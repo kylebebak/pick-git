@@ -107,7 +107,7 @@ class PGMethodMixin(object):
         if not entities[1]:
             entities.pop()
         if not args:
-            self.copy(', '.join(entities))
+            self.copy(' '.join(entities))
         else:
             self.execute(*(args + tuple(entities)))
 
@@ -139,8 +139,8 @@ class PGMethodMixin(object):
         """
         show = kwargs.pop('show', False)
         cd_repository_root()
-        entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']
-        file = pick_modified_file(entities); self.copy(file)
+        entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']; self.copy(' '.join(entities))
+        file = pick_modified_file(*entities)
         if show:
             self.execute('git', 'show', '{}:{}'.format(entities[0], file))
         else:

@@ -33,5 +33,5 @@ if __name__ == '__main__':
     try:
         f = pg.__getattribute__(args.function)(*args.args, **kwargs)
     except AttributeError as e:
-        print('{} is not a valid pick-git function, exiting'.format(e))
+        print("'{}' is not a valid pick-git function, exiting".format(args.function))
         sys.exit()
