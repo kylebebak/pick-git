@@ -1,6 +1,6 @@
 # pick-git
 
-__pick-git__ is a cross-platform set of tools for leveraging [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
+__pick-git__ is a set of tools for leveraging [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
 
 It's installable via `pip` and works with Python 2/3.
 
