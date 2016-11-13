@@ -8,8 +8,10 @@ parser = argparse.ArgumentParser(description='Invoke a pick-git function.')
 
 parser.add_argument('-b', '--both', action='store_true',
                     help='pick both branches, commits, or files, where appropriate')
-parser.add_argument('-s', '--show', action='store_true',
+parser.add_argument('-S', '--show', action='store_true',
                     help='show file instead of diffing it, where appropriate')
+parser.add_argument('-s', '--staged', action='store_true',
+                    help='diff staged files, where appropriate')
 parser.add_argument('-d', '--detailed', action='store_true',
                     help='show detail of commits instead of just count, where appropriate')
 parser.add_argument('-n', '--nocopy', dest='no_copy', action='store_true',
@@ -32,7 +34,7 @@ def main():
     """
     args = parser.parse_args()
     kwargs = {name: args.__getattribute__(name) for name in [
-        'both', 'show', 'detailed', 'no_copy', 'shell', 'rcfile',
+        'both', 'show', 'staged', 'detailed', 'no_copy', 'shell', 'rcfile',
     ]}
     if not subprocess.call(['which', 'pick']) == 0:
         print("pick isn't installed! exiting...")

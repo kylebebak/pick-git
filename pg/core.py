@@ -59,9 +59,8 @@ def pick_commit_reflog(*args):
 
 @exit_on_keyboard_interrupt
 def pick_modified_file(*args):
-    """Pick a file whose state differs between two branches or commits, which are
-    passed in `args`. If `args` contains only one branch or commit, this is
-    compared against HEAD.
+    """Pick a file whose state differs between branches or commits, which are
+    passed in `args`. `args` can contain between 0 and 2 elements.
     """
     files = subprocess.Popen(('git', 'diff', '--name-only',) + args, stdout=PIPE)
     file = subprocess.check_output(['pick'], stdin=files.stdout)

@@ -23,7 +23,7 @@ def current_branch():
 
 class PGPublicMethodMixin(object):
     ###############
-    # BRANCHES/COMMITS
+    # BRANCHES/COMMITS/FILES
     ###############
     def _pick_both(self, *args, **kwargs):
         """Helper that invokes a pick helper `function` one or two times, and
@@ -56,6 +56,15 @@ class PGPublicMethodMixin(object):
         """
         self._pick_both(*args, function=pick_commit_reflog, **kwargs)
 
+    def file(self, *args, **kwargs):
+        """Pick a modified file pass it to `args`, or copy file name.
+        """
+        cd_repository_root()
+        file = pick_modified_file('--staged') if kwargs.pop('staged', False) else pick_modified_file()
+        if not args:
+            self.copy(file)
+        else:
+            self.execute(*args + (file,))
 
     ###############
     # FILES BETWEEN BRANCHES/COMMITS
@@ -93,7 +102,6 @@ class PGPublicMethodMixin(object):
         """
         self._pick_file(*args, function=pick_commit_reflog, **kwargs)
 
-
     ###############
     # MISCELLANEOUS
     ###############
@@ -110,7 +118,6 @@ class PGPublicMethodMixin(object):
                     this=this, that=that))
         else:
             self.execute('git rev-list --left-right --count {}...{}'.format(this, that))
-
 
     def file_commit(self, *args, **kwargs):
         """Pick a file from index, and show all commits for this file. Pick a commit
