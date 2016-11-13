@@ -25,11 +25,12 @@ class PGPublicMethodMixin(object):
     ###############
     # BRANCHES/COMMITS
     ###############
-    def _pick_both(self, *args, function, **kwargs):
+    def _pick_both(self, *args, **kwargs):
         """Helper that invokes a pick helper `function` one or two times, and
         passes the string git `entities`, e.g. branches or commit hashes, to
         `args`.
         """
+        function = kwargs.get('function')
         entities = [function(), function() if kwargs.pop('both', False) else None]
         if not entities[1]:
             entities.pop()
@@ -59,11 +60,12 @@ class PGPublicMethodMixin(object):
     ###############
     # FILES BETWEEN BRANCHES/COMMITS
     ###############
-    def _pick_file(self, *args, function, **kwargs):
+    def _pick_file(self, *args, **kwargs):
         """Helper that invokes a pick helper `function` one or two times, and
         passes the string git `entities`, e.g. branches or commit hashes, to
         `args`.
         """
+        function = kwargs.get('function')
         show = kwargs.pop('show', False)
         cd_repository_root()
         entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']; self.copy(' '.join(entities))
