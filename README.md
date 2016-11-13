@@ -21,18 +21,39 @@ pip install pick-git
 
 
 ## Usage
-Check out how `pick-git` removes the pain finding and comparing commits.
+Check out how `pick-git` removes the pain of finding and comparing commits.
 
 ![pick-git -b commit git diff](https://raw.githubusercontent.com/kylebebak/pick-git/master/examples/ghp.gif)
 
 
-## Tests
+`~/.bash_profile`
+
 ~~~sh
-# from the project root
-python -m unittest discover tests -v
+alias gbp="pick-git --shell /bin/bash --rcfile ~/.git_aliases branch"
+alias ghp="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit"
+alias grp="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit_reflog"
+alias gfp="pick-git --shell /bin/bash --rcfile ~/.git_aliases file"
+
+alias gbpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases branch_file"
+alias ghpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit_file"
+alias grpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit_reflog_file"
+alias gpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases file_commit"
+
+alias gbc="pick-git --shell /bin/bash --rcfile ~/.git_aliases branch_compare"
 ~~~
 
-The tests don't do anything yet.
+
+`~/.git_aliases`
+
+~~~sh
+alias gb='git branch'
+alias go='git checkout'
+alias gc='git commit'
+alias gm='git merge'
+alias gd='git diff'
+alias ga='git add'
+alias gr='git reset'
+~~~
 
 
 ## Contributing
@@ -46,7 +67,10 @@ The "primitives" for the package are defined in `pg/core.py`, and are listed bel
 
 The public methods whose names are passed to `pick-git` as one of its command line args, e.g. `branch`, `commit` `branch_compare`, etc, are defined in a mixin class in `pg/helpers.py`.
 
-The package currently has no tests, but I would like to write tests for the primitives and the public methods. I would be grateful if anyone wants to help.
+### Tests
+The package currently has no tests. This is because `pick-git`'s functions, even the "primitives" in `pg/core.py`, require user keystrokes to return a value. Sending keystrokes isn't part of Python's standard library, and anyway Python doesn't seem like the best way to do this, although [this seems promising](http://stackoverflow.com/questions/12755968/sending-arrow-keys-to-popen).
+
+If anyone has ideas I'd love to hear them.
 
 
 ## License

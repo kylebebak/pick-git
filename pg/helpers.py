@@ -57,7 +57,9 @@ class PGPublicMethodMixin(object):
         self._pick_both(*args, function=pick_commit_reflog, **kwargs)
 
     def file(self, *args, **kwargs):
-        """Pick a modified file pass it to `args`, or copy file name.
+        """Pick a modified file relative to last commit, pass it to `args`, or
+        copy file name. Optionally pick from files that have been `staged` for
+        commit.
         """
         cd_repository_root()
         file = pick_modified_file('--staged') if kwargs.pop('staged', False) else pick_modified_file()
