@@ -29,17 +29,17 @@ Check out how `pick-git` removes the pain of finding and comparing commits.
 `~/.bash_profile`
 
 ~~~sh
-alias gbp="pick-git --shell /bin/bash --rcfile ~/.git_aliases branch"
-alias ghp="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit"
-alias grp="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit_reflog"
-alias gfp="pick-git --shell /bin/bash --rcfile ~/.git_aliases file"
+alias gbp="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function branch"
+alias ghp="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function commit"
+alias grp="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function commit_reflog"
+alias gfp="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function file"
 
-alias gbpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases branch_file"
-alias ghpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit_file"
-alias grpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases commit_reflog_file"
-alias gpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases file_commit"
+alias gbpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function branch_file"
+alias ghpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function commit_file"
+alias grpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function commit_reflog_file"
+alias gpf="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function file_commit"
 
-alias gbc="pick-git --shell /bin/bash --rcfile ~/.git_aliases branch_compare"
+alias gbc="pick-git --shell /bin/bash --rcfile ~/.git_aliases --function branch_compare"
 ~~~
 
 

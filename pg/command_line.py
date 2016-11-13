@@ -22,7 +22,8 @@ parser.add_argument('--shell',
 parser.add_argument('--rcfile',
                     help='specify startup file invoked by shell when `execute` is invoked')
 
-parser.add_argument('function')
+parser.add_argument('--function',
+                    help='specify shell invoked interactively when `execute` is invoked')
 parser.add_argument('args', help='other args to pass to function', nargs='*')
 
 
