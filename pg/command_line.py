@@ -1,6 +1,7 @@
 import subprocess, argparse, sys
 
 from .pg import PG
+from .helpers import PGPublicMethodMixin
 
 
 parser = argparse.ArgumentParser(description='Invoke a pick-git function.')
@@ -11,6 +12,8 @@ parser.add_argument('-s', '--show', action='store_true',
                     help='show file instead of diffing it, where appropriate')
 parser.add_argument('-d', '--detailed', action='store_true',
                     help='show detail of commits instead of just count, where appropriate')
+parser.add_argument('-n', '--nocopy', dest='no_copy', action='store_true',
+                    help='disable automatic copying of branch names, commit hashes, file names, etc')
 
 parser.add_argument('--shell',
                     help='specify shell invoked interactively when `execute` is invoked')
@@ -29,14 +32,13 @@ def main():
     """
     args = parser.parse_args()
     kwargs = {name: args.__getattribute__(name) for name in [
-        'both', 'show', 'detailed', 'shell', 'rcfile',
+        'both', 'show', 'detailed', 'no_copy', 'shell', 'rcfile',
     ]}
     if not subprocess.call(['which', 'pick']) == 0:
         print("pick isn't installed! exiting...")
         sys.exit()
     pg = PG(**kwargs)
-    try:
-        pg.__getattribute__(args.function)(*args.args, **kwargs)
-    except AttributeError:
+    if not hasattr(PGPublicMethodMixin, args.function):
         print("'{}' is not a valid pick-git function, exiting".format(args.function))
         sys.exit()
+    pg.__getattribute__(args.function)(*args.args, **kwargs)

@@ -1,18 +1,19 @@
 from os import getenv
 from subprocess import Popen
 
-from .helpers import PGMethodMixin
+from .helpers import PGPublicMethodMixin
 
 
-class PG(PGMethodMixin):
+class PG(PGPublicMethodMixin):
 
-    def __init__(self, shell='', rcfile='', **kwargs):
+    def __init__(self, no_copy=False, shell='', rcfile='', **kwargs):
         self.shell = shell or getenv('SHELL')
         self.rcfile = rcfile
-        self._copy = lambda text: None
 
-        # import pyperclip if it's installed, use `pyperclip.copy` if it works
-        try:
+        self._copy = lambda text: None
+        if no_copy: # don't attempt to use pyperclip
+            return
+        try: # import pyperclip if it's installed, use `pyperclip.copy` if it works
             import pyperclip
         except ImportError:
             print('install pyperclip for a better experience')

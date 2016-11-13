@@ -1,18 +1,7 @@
-import subprocess, os, sys
-from subprocess import STDOUT, PIPE
-from functools import wraps
+import subprocess, os
 
+from .core import pick_branch, pick_commit, pick_commit_reflog, pick_modified_file, pick_file
 
-def add_new_line(b):
-    """To end of `str` or `bytes` instance.
-    """
-    if sys.version_info < (3, 0, 0):
-        if b[-1] != '\n':
-            b += '\n'
-    else:
-        if b[-1:] != bytes('\n', 'utf-8'):
-            b += bytes('\n', 'utf-8')
-    return b
 
 def repository_root():
     """Return full path to root of repo.
@@ -32,69 +21,7 @@ def current_branch():
     return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip().decode('utf-8')
 
 
-def exit_on_keyboard_interrupt(f):
-    """Decorator that allows user to exit script by sending a keyboard interrupt
-    (ctrl + c) without raising an exception.
-    """
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        raise_exception = kwargs.pop('raise_exception', False)
-        try:
-            return f(*args, **kwargs)
-        except KeyboardInterrupt:
-            if not raise_exception:
-                sys.exit()
-            raise KeyboardInterrupt
-    return wrapper
-
-@exit_on_keyboard_interrupt
-def pick_branch(*args):
-    """Pick a branch, local or remote.
-    """
-    branches = subprocess.Popen(('git', 'branch', '-a') + args, stdout=PIPE)
-    branch = subprocess.check_output(['pick'], stdin=branches.stdout)
-    return branch.split()[-1].decode('utf-8')
-
-@exit_on_keyboard_interrupt
-def pick_commit(*args):
-    """Pick a commit hash.
-    """
-    commits = subprocess.check_output(('git', 'log', "--pretty=format:%h %ad | %s%d [%an]", '--date=short') + args)
-    commits = add_new_line(commits)
-    p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-    commit = p.communicate(input=commits)[0]
-    return commit.split()[0].decode('utf-8')
-
-@exit_on_keyboard_interrupt
-def pick_commit_reflog(*args):
-    """Pick a commit hash from the reflog.
-    """
-    commits = subprocess.check_output(('git', 'reflog', '--all', '--date=short') + args)
-    commits = add_new_line(commits)
-    p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-    commit = p.communicate(input=commits)[0]
-    return commit.split()[0].decode('utf-8')
-
-@exit_on_keyboard_interrupt
-def pick_modified_file(*args):
-    """Pick a file whose state differs between two branches or commits, which are
-    passed in `args`. If `args` contains only one branch or commit, this is
-    compared against HEAD.
-    """
-    files = subprocess.Popen(('git', 'diff', '--name-only',) + args, stdout=PIPE)
-    file = subprocess.check_output(['pick'], stdin=files.stdout)
-    return file.strip().decode('utf-8')
-
-@exit_on_keyboard_interrupt
-def pick_file(*args):
-    """Pick a file from the index.
-    """
-    files = subprocess.Popen(('git', 'ls-tree', '-r', 'master', '--name-only') + args, stdout=PIPE)
-    file = subprocess.check_output(['pick'], stdin=files.stdout)
-    return file.strip().decode('utf-8')
-
-
-class PGMethodMixin(object):
+class PGPublicMethodMixin(object):
     ###############
     # BRANCHES/COMMITS
     ###############
@@ -141,10 +68,10 @@ class PGMethodMixin(object):
         cd_repository_root()
         entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']; self.copy(' '.join(entities))
         file = pick_modified_file(*entities)
-        if show:
-            self.execute('git', 'show', '{}:{}'.format(entities[0], file))
+        if show: # ugly syntax, but (a, b*, c) syntax isn't valid in python 2
+            self.execute(*('git', 'show',) + args + ('{}:{}'.format(entities[0], file),))
         else:
-            self.execute('git', 'diff', '{} {} -- {}'.format(entities[0], entities[1], file))
+            self.execute(*('git', 'diff',) + args + ('{} -- {} {}'.format(entities[0], entities[1], file),))
 
     def branch_file(self, *args, **kwargs):
         """Pick branch(es), get list of files that are different in these
@@ -196,6 +123,6 @@ class PGMethodMixin(object):
         except KeyboardInterrupt:
             other_file = file
         if show:
-            self.execute('git', 'show', '{}:{}'.format(commit, file))
+            self.execute(*('git', 'show',) + args + ('{}:{}'.format(commit, file),))
         else:
-            self.execute('git', 'diff', '{} -M25 -- {} {}'.format(commit, file, other_file))
+            self.execute(*('git', 'diff',) + args + ('{} -- {} {}'.format(commit, file, other_file),))
