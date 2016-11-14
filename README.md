@@ -1,6 +1,6 @@
 # pick-git
 
-__pick-git__ is a set of command line tools for leveraging [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
+__pick-git__ is a set of command line tools for leveraging thoughtbot's [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
 
 Git can be a bit of a pain, especially when passing branches or commit hashes as args. Big projects have lots of branches and tons of commits. Finding and copying commit hashes to compare commits, for example, is awkward and slow.
 
@@ -105,3 +105,7 @@ If anyone has ideas I'd love to hear them.
 
 ## License
 This code is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+
+## Thanks
+To Calle Erlandsson and thoughtbot for writing pick =)
