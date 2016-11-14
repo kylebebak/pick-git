@@ -57,7 +57,7 @@ alias gr='git reset'
 
 
 ## Contributing
-The "primitives" for the package are defined in `pick_git/core.py`, and are listed below. If you think of other useful primitives please fork the repo and submit a pull request.
+The "primitives" for the package are defined in `pick_git/core.py` and are listed below. These are the functions that actually invoke `pick`. If you think of other useful primitives please fork the repo and submit a pull request.
 
 - `pick_branch`
 - `pick_commit`
@@ -65,10 +65,10 @@ The "primitives" for the package are defined in `pick_git/core.py`, and are list
 - `pick_modified_file`
 - `pick_file`
 
-The public methods whose names are passed to `pick-git` as one of its command line args, e.g. `branch`, `commit` `branch_compare`, etc, are defined in a mixin class in `pick_git/helpers.py`.
+The public methods whose names are passed to `pick-git` in the `--function` argument, for example `branch` or `commit`, are defined in a mixin class in `pick_git/helpers.py`.
 
 ### Tests
-The package currently has no tests. This is because `pick-git`'s functions, even the "primitives" in `pick_git/core.py`, require user keystrokes to return a value. Sending keystrokes isn't part of Python's standard library, and anyway Python doesn't seem like the best way to do this, although [this seems promising](http://stackoverflow.com/questions/12755968/sending-arrow-keys-to-popen).
+The package currently has no tests. This is because `pick-git` requires user keystrokes to return a value. Sending keystrokes isn't part of Python's standard library, and anyway Python doesn't seem like the best way to do this, although [this seems promising](http://stackoverflow.com/questions/12755968/sending-arrow-keys-to-popen).
 
 If anyone has ideas I'd love to hear them.
 
