@@ -45,7 +45,7 @@ class PGPublicMethodMixin(object):
         self._pick_both(*args, function=pick_branch, **kwargs)
 
     def commit(self, *args, **kwargs):
-        """Pick a commit hash(es) and pass them to `args`, or copy commit hash
+        """Pick commit hash(es) and pass them to `args`, or copy commit hash
         names.
         """
         self._pick_both(*args, function=pick_commit, **kwargs)

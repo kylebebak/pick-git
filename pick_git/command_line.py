@@ -6,25 +6,26 @@ from .helpers import PGPublicMethodMixin
 
 parser = argparse.ArgumentParser(description='Invoke a pick-git function.')
 
+parser.add_argument('--function', required=True,
+                    help='Specify public function to invoke. This argument is required. See README for descriptions of public functions.')
+
 parser.add_argument('-b', '--both', action='store_true',
-                    help='pick both branches, commits, or files, where appropriate')
+                    help='Pick both branches, commits, or files, where appropriate.')
 parser.add_argument('-S', '--show', action='store_true',
-                    help='show file instead of diffing it, where appropriate')
+                    help='Show file instead of diffing it, where appropriate.')
 parser.add_argument('-s', '--staged', action='store_true',
-                    help='diff staged files, where appropriate')
+                    help='Diff staged files, where appropriate.')
 parser.add_argument('-d', '--detailed', action='store_true',
-                    help='show detail of commits instead of just count, where appropriate')
+                    help='Show detail of commits instead of just count, when invoking branch_compare.')
 parser.add_argument('-n', '--nocopy', dest='no_copy', action='store_true',
-                    help='disable automatic copying of branch names, commit hashes, file names, etc')
+                    help='Disable automatic copying of branch names, commit hashes, file names, etc.')
 
 parser.add_argument('--shell',
-                    help='specify shell invoked interactively when `execute` is invoked')
+                    help='Specify shell invoked interactively when `execute` is invoked.')
 parser.add_argument('--rcfile',
-                    help='specify startup file invoked by shell when `execute` is invoked')
+                    help='Specify startup file invoked by shell when `execute` is invoked.')
 
-parser.add_argument('--function', required=True,
-                    help='specify shell invoked interactively when `execute` is invoked')
-parser.add_argument('args', help='other args to pass to function', nargs='*')
+parser.add_argument('args', help='Pass other args to function.', nargs='*')
 
 
 def main():
