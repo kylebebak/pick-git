@@ -1,5 +1,5 @@
 import unittest
-from pick_git import pick_git
+from pick_git import pg
 
 class TestCore(unittest.TestCase):
 
