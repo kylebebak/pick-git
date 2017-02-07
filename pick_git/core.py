@@ -1,6 +1,24 @@
-import subprocess, sys
+import subprocess, sys, os
 from subprocess import STDOUT, PIPE
 from functools import wraps
+
+
+def repository_root():
+    """Return full path to root of repo.
+    """
+    return subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip().decode('utf-8')
+
+def cd_repository_root():
+    """Change directory to repo root. `os.chdir` means directory is changed for
+    instance of shell from which script is executed, rather than only in child
+    process.
+    """
+    os.chdir(repository_root())
+
+def current_branch():
+    """Return name of currently checked out branch.
+    """
+    return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip().decode('utf-8')
 
 
 def add_new_line(b):
@@ -70,6 +88,7 @@ def pick_modified_file(*args):
 def pick_file(*args):
     """Pick a file from the index.
     """
-    files = subprocess.Popen(('git', 'ls-tree', '-r', 'master', '--name-only') + args, stdout=PIPE)
+    branch = current_branch()
+    files = subprocess.Popen(('git', 'ls-tree', '-r', branch, '--name-only') + args, stdout=PIPE)
     file = subprocess.check_output(['pick'], stdin=files.stdout)
     return file.strip().decode('utf-8')

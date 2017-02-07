@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pick-git',
-    version='1.1.0',
+    version='1.1.1',
     description="Use pick by thoughtbot to turbocharge your Git workflow",
     long_description='Check it out on GitHub',
     keywords='pick git thoughtbot fuzzy select terminal productivity',

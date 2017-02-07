@@ -1,24 +1,4 @@
-import subprocess, os
-
-from .core import pick_branch, pick_commit, pick_commit_reflog, pick_modified_file, pick_file
-
-
-def repository_root():
-    """Return full path to root of repo.
-    """
-    return subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip().decode('utf-8')
-
-def cd_repository_root():
-    """Change directory to repo root. `os.chdir` means directory is changed for
-    instance of shell from which script is executed, rather than only in child
-    process.
-    """
-    os.chdir(repository_root())
-
-def current_branch():
-    """Return name of currently checked out branch.
-    """
-    return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip().decode('utf-8')
+from .core import pick_branch, pick_commit, pick_commit_reflog, pick_modified_file, pick_file, cd_repository_root, current_branch
 
 
 class PGPublicMethodMixin(object):
