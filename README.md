@@ -39,6 +39,7 @@ It's a good idea to create shortcut aliases to all of the functions exposed by _
 
 ~~~sh
 alias gbp="pick-git --function branch"
+alias gtp="pick-git --function tag"
 alias ghp="pick-git --function commit"
 alias grp="pick-git --function commit_reflog"
 alias gfp="pick-git --function file"

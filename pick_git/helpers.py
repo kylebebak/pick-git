@@ -1,4 +1,4 @@
-from .core import pick_branch, pick_commit, pick_commit_reflog, pick_modified_file, pick_file, cd_repository_root, current_branch
+from .core import pick_branch, pick_tag, pick_commit, pick_commit_reflog, pick_modified_file, pick_file, cd_repository_root, current_branch
 
 
 class PGPublicMethodMixin(object):
@@ -7,7 +7,7 @@ class PGPublicMethodMixin(object):
     ###############
     def _pick_both(self, *args, **kwargs):
         """Helper that invokes a pick helper `function` one or two times, and
-        passes the string git `entities`, e.g. branches or commit hashes, to
+        passes the git `entities` string, e.g. branches or commit hashes, to
         `args`.
         """
         function = kwargs.get('function')
@@ -23,6 +23,11 @@ class PGPublicMethodMixin(object):
         """Pick branch(es) and pass them to `args`, or copy branch names.
         """
         self._pick_both(*args, function=pick_branch, **kwargs)
+
+    def tag(self, *args, **kwargs):
+        """Pick tag(s) and pass them to `args`, or copy tag names.
+        """
+        self._pick_both(*args, function=pick_tag, **kwargs)
 
     def commit(self, *args, **kwargs):
         """Pick commit hash(es) and pass them to `args`, or copy commit hash

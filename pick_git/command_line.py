@@ -10,7 +10,7 @@ parser.add_argument('--function', required=True,
                     help='Specify public function to invoke. This argument is required. See README for descriptions of public functions.')
 
 parser.add_argument('-b', '--both', action='store_true',
-                    help='Pick both branches, commits, or files, where appropriate.')
+                    help='Pick both branches, tags, commits, or files, where appropriate.')
 parser.add_argument('-S', '--show', action='store_true',
                     help='Show file instead of diffing it, where appropriate.')
 parser.add_argument('-s', '--staged', action='store_true',

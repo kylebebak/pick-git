@@ -56,6 +56,14 @@ def pick_branch(*args):
     return branch.split()[-1].decode('utf-8')
 
 @exit_on_keyboard_interrupt
+def pick_tag(*args):
+    """Pick a local tag.
+    """
+    branches = subprocess.Popen(('git', 'tag', '-l') + args, stdout=PIPE)
+    branch = subprocess.check_output(['pick'], stdin=branches.stdout)
+    return branch.split()[-1].decode('utf-8')
+
+@exit_on_keyboard_interrupt
 def pick_commit(*args):
     """Pick a commit hash.
     """
