@@ -77,7 +77,7 @@ def pick_commit(*args):
 def pick_commit_reflog(*args):
     """Pick a commit hash from the reflog.
     """
-    commits = subprocess.check_output(('git', 'reflog', '--all', '--date=short') + args)
+    commits = subprocess.check_output(('git', 'reflog', '--date=short') + args)
     commits = add_new_line(commits)
     p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
     commit = p.communicate(input=commits)[0]
