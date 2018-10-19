@@ -1,4 +1,6 @@
-import subprocess, sys, os
+import subprocess
+import sys
+import os
 from subprocess import STDOUT, PIPE
 from functools import wraps
 
@@ -8,12 +10,14 @@ def repository_root():
     """
     return subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).strip().decode('utf-8')
 
+
 def cd_repository_root():
     """Change directory to repo root. `os.chdir` means directory is changed for
     instance of shell from which script is executed, rather than only in child
     process.
     """
     os.chdir(repository_root())
+
 
 def current_branch():
     """Return name of currently checked out branch.
@@ -32,6 +36,7 @@ def add_new_line(b):
             b += bytes('\n', 'utf-8')
     return b
 
+
 def exit_on_keyboard_interrupt(f):
     """Decorator that allows user to exit script by sending a keyboard interrupt
     (ctrl + c) without raising an exception.
@@ -47,6 +52,7 @@ def exit_on_keyboard_interrupt(f):
             raise KeyboardInterrupt
     return wrapper
 
+
 @exit_on_keyboard_interrupt
 def pick_branch(*args):
     """Pick a branch, local or remote.
@@ -55,6 +61,7 @@ def pick_branch(*args):
     branch = subprocess.check_output(['pick'], stdin=branches.stdout)
     return branch.split()[-1].decode('utf-8')
 
+
 @exit_on_keyboard_interrupt
 def pick_tag(*args):
     """Pick a local tag.
@@ -62,6 +69,7 @@ def pick_tag(*args):
     branches = subprocess.Popen(('git', 'tag', '-l') + args, stdout=PIPE)
     branch = subprocess.check_output(['pick'], stdin=branches.stdout)
     return branch.split()[-1].decode('utf-8')
+
 
 @exit_on_keyboard_interrupt
 def pick_commit(*args):
@@ -73,6 +81,7 @@ def pick_commit(*args):
     commit = p.communicate(input=commits)[0]
     return commit.split()[0].decode('utf-8')
 
+
 @exit_on_keyboard_interrupt
 def pick_commit_reflog(*args):
     """Pick a commit hash from the reflog.
@@ -83,14 +92,16 @@ def pick_commit_reflog(*args):
     commit = p.communicate(input=commits)[0]
     return commit.split()[0].decode('utf-8')
 
+
 @exit_on_keyboard_interrupt
 def pick_modified_file(*args):
     """Pick a file whose state differs between branches or commits, which are
     passed in `args`. `args` can contain between 0 and 2 elements.
     """
-    files = subprocess.Popen(('git', 'diff', '--name-only',) + args, stdout=PIPE)
+    files = subprocess.Popen(('git', 'diff', '--name-only') + args, stdout=PIPE)
     file = subprocess.check_output(['pick'], stdin=files.stdout)
     return file.strip().decode('utf-8')
+
 
 @exit_on_keyboard_interrupt
 def pick_file(*args):

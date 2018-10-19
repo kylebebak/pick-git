@@ -64,12 +64,13 @@ class PGPublicMethodMixin(object):
         function = kwargs.get('function')
         show = kwargs.pop('show', False)
         cd_repository_root()
-        entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']; self.copy(' '.join(entities))
+        entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']
+        self.copy(' '.join(entities))
         file = pick_modified_file(*entities)
-        if show: # ugly syntax, but (a, b*, c) syntax isn't valid in python 2
-            self.execute(*('git', 'show',) + args + ('{}:{}'.format(entities[0], file),))
+        if show:  # ugly syntax, but (a, b*, c) syntax isn't valid in python 2
+            self.execute(*('git', 'show') + args + ('{}:{}'.format(entities[0], file),))
         else:
-            self.execute(*('git', 'diff',) + args + ('{} -- {} {}'.format(entities[0], entities[1], file),))
+            self.execute(*('git', 'diff') + args + ('{} -- {} {}'.format(entities[0], entities[1], file),))
 
     def branch_file(self, *args, **kwargs):
         """Pick branch(es), get list of files that are different in these
@@ -112,13 +113,14 @@ class PGPublicMethodMixin(object):
         """
         show = kwargs.pop('show', False)
         cd_repository_root()
-        file = pick_file(); self.copy(file)
+        file = pick_file()
+        self.copy(file)
         commit = pick_commit('--follow', '--', file)
         try:
             other_file = pick_modified_file(commit, raise_exception=True)
         except KeyboardInterrupt:
             other_file = file
         if show:
-            self.execute(*('git', 'show',) + args + ('{}:{}'.format(commit, file),))
+            self.execute(*('git', 'show') + args + ('{}:{}'.format(commit, file),))
         else:
-            self.execute(*('git', 'diff',) + args + ('{} -- {} {}'.format(commit, file, other_file),))
+            self.execute(*('git', 'diff') + args + ('{} -- {} {}'.format(commit, file, other_file),))

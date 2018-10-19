@@ -11,9 +11,9 @@ class PG(PGPublicMethodMixin):
         self.rcfile = rcfile
 
         self._copy = lambda text: None
-        if no_copy: # don't attempt to use pyperclip
+        if no_copy:  # don't attempt to use pyperclip
             return
-        try: # import pyperclip if it's installed, use `pyperclip.copy` if it works
+        try:  # import pyperclip if it's installed, use `pyperclip.copy` if it works
             import pyperclip
         except ImportError:
             print('install pyperclip for a better experience')
@@ -36,7 +36,8 @@ class PG(PGPublicMethodMixin):
         `shell` var, the shell specified by the $SHELL env var, or by the default
         shell.
         """
-        commands = ' '.join(commands); print(commands)
+        commands = ' '.join(commands)
+        print(commands)
         rcfile = ['--rcfile', self.rcfile] if self.rcfile else []
         if self.shell:
             p = Popen([self.shell] + rcfile + ['-i', '-c', commands])

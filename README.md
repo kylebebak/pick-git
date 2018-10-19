@@ -1,5 +1,8 @@
 # pick-git
 
+
+![License](https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667)
+
 __pick-git__ is a set of command line tools for leveraging thoughtbot's [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
 
 Git can be a bit of a pain, especially when passing branches or commit hashes as args. Big projects have lots of branches and tons of commits. Finding and copying commit hashes to compare commits, for example, is awkward and slow.
@@ -25,7 +28,6 @@ Check out how __pick-git__ removes the pain of finding and comparing commits.
 
 ![pick-git -b commit git diff](https://raw.githubusercontent.com/kylebebak/pick-git/master/examples/ghp.gif)
 
-
 I invoked `ghp -b gd`, but what just happened? Let's break it down.
 
 I have `ghp` aliased to `pick-git --function commit`. The function argument is one of the public functions exposed by pick-git.
@@ -33,6 +35,7 @@ I have `ghp` aliased to `pick-git --function commit`. The function argument is o
 `gd` is a shortcut I have that resolves to `git diff`. The `-b` flag allows me to pick both commits and compare them, instead of just picking one and comparing it with HEAD.
 
 At the end the final command that was invoked, `gd 28faaf7 4750072`, was printed to the console. I was able to find two commits and compare them very quickly and with very few keystrokes. __Even if these commits had been in a much bigger project and were months old__, pick's fuzzy select would have found them in no time as long as my commit messages were descriptive.
+
 
 ### Shortcuts to pick-git Public Functions
 It's a good idea to create shortcut aliases to all of the functions exposed by __pick-git__. You can simply copy and paste the following into your startup script, e.g. `.bash_profile`.
@@ -64,6 +67,7 @@ Here are descriptions of __pick-git__'s public functions. Run `pick-git -h` to g
 - __branch_compare__: Find out how far ahead or behind `this` branch is compared with `that`. A `detailed` comparison shows all commits instead of just the commit count.
 - __file_commit__: Pick a file from index, and show all commits for this file. Pick a commit and diff file against HEAD or `show` it.
 
+
 ### --shell and --rcfile
 I actually lied above. I really have `ghp` aliased to `pick-git --shell /bin/bash --rcfile ~/.git_aliases --function commit`. What are these --shell and --rcfile args, and why are they useful?
 
@@ -81,6 +85,7 @@ alias gd='git diff'
 alias ga='git add'
 alias gr='git reset'
 ~~~
+
 
 ### Help
 Run `pick-git -h`.

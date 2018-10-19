@@ -1,4 +1,6 @@
-import subprocess, argparse, sys
+import subprocess
+import argparse
+import sys
 
 from .pg import PG
 from .helpers import PGPublicMethodMixin
