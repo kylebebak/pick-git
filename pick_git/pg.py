@@ -19,7 +19,7 @@ class PG(PGPublicMethodMixin):
             print('install pyperclip for a better experience')
         else:
             try:
-                pyperclip.copy('')
+                pyperclip.paste()
             except pyperclip.exceptions.PyperclipException:
                 print("pyperclip is installed but it's missing a dependency, see pyperclip repo for details")
             else:
