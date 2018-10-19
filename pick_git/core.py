@@ -40,6 +40,12 @@ def add_new_line(b):
 def exit_on_keyboard_interrupt(f):
     """Decorator that allows user to exit script by sending a keyboard interrupt
     (ctrl + c) without raising an exception.
+
+    WARNING: there is no guarantee KeyboardInterrupt will be raised if `ctrl+c` is
+    pressed while the subprocess is running, which means we also need to guard
+    against empty results from `pick`!
+
+    See here: https://stackoverflow.com/questions/39499959/terminating-a-subprocess-with-keyboardinterrupt/39503654
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -57,8 +63,11 @@ def exit_on_keyboard_interrupt(f):
 def pick_branch(*args):
     """Pick a branch, local or remote.
     """
-    branches = subprocess.Popen(('git', 'branch', '-a') + args, stdout=PIPE)
-    branch = subprocess.check_output(['pick'], stdin=branches.stdout)
+    branches = subprocess.check_output(('git', 'branch', '-a') + args)
+    p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    branch = p.communicate(input=branches)[0]
+    if not branch:
+        raise KeyboardInterrupt
     return branch.split()[-1].decode('utf-8')
 
 
@@ -66,8 +75,11 @@ def pick_branch(*args):
 def pick_tag(*args):
     """Pick a local tag.
     """
-    branches = subprocess.Popen(('git', 'tag', '-l') + args, stdout=PIPE)
-    branch = subprocess.check_output(['pick'], stdin=branches.stdout)
+    branches = subprocess.check_output(('git', 'tag', '-l') + args)
+    p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    branch = p.communicate(input=branches)[0]
+    if not branch:
+        raise KeyboardInterrupt
     return branch.split()[-1].decode('utf-8')
 
 
@@ -76,9 +88,10 @@ def pick_commit(*args):
     """Pick a commit hash.
     """
     commits = subprocess.check_output(('git', 'log', "--pretty=format:%h %ad | %s%d [%an]", '--date=short') + args)
-    commits = add_new_line(commits)
     p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-    commit = p.communicate(input=commits)[0]
+    commit = p.communicate(input=add_new_line(commits))[0]
+    if not commit:
+        raise KeyboardInterrupt
     return commit.split()[0].decode('utf-8')
 
 
@@ -87,9 +100,10 @@ def pick_commit_reflog(*args):
     """Pick a commit hash from the reflog.
     """
     commits = subprocess.check_output(('git', 'reflog', '--date=short') + args)
-    commits = add_new_line(commits)
     p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
-    commit = p.communicate(input=commits)[0]
+    commit = p.communicate(input=add_new_line(commits))[0]
+    if not commit:
+        raise KeyboardInterrupt
     return commit.split()[0].decode('utf-8')
 
 
@@ -98,8 +112,11 @@ def pick_modified_file(*args):
     """Pick a file whose state differs between branches or commits, which are
     passed in `args`. `args` can contain between 0 and 2 elements.
     """
-    files = subprocess.Popen(('git', 'diff', '--name-only') + args, stdout=PIPE)
-    file = subprocess.check_output(['pick'], stdin=files.stdout)
+    files = subprocess.check_output(('git', 'diff', '--name-only') + args)
+    p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    file = p.communicate(input=files)[0]
+    if not file:
+        raise KeyboardInterrupt
     return file.strip().decode('utf-8')
 
 
@@ -108,6 +125,9 @@ def pick_file(*args):
     """Pick a file from the index.
     """
     branch = current_branch()
-    files = subprocess.Popen(('git', 'ls-tree', '-r', branch, '--name-only') + args, stdout=PIPE)
-    file = subprocess.check_output(['pick'], stdin=files.stdout)
+    files = subprocess.check_output(('git', 'ls-tree', '-r', branch, '--name-only') + args)
+    p = subprocess.Popen(['pick'], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    file = p.communicate(input=files)[0]
+    if not file:
+        raise KeyboardInterrupt
     return file.strip().decode('utf-8')
