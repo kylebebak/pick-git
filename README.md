@@ -3,11 +3,11 @@
 
 ![License](https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667)
 
-__pick-git__ is a set of command line tools for leveraging thoughtbot's [pick](https://github.com/calleerlandsson/pick) to turbocharge your Git workflow.
+__pick-git__ is a set of command line tools for leveraging [fzf](https://github.com/junegunn/fzf) to turbocharge your Git workflow.
 
 Git can be a bit of a pain, especially when passing branches or commit hashes as args. Big projects have lots of branches and tons of commits. Finding and copying commit hashes to compare commits, for example, is awkward and slow.
 
-`pick`, however, was literally born for jobs like this. __pick-git__ uses `pick` to make working with branches, commits and files in your project's repo a breeze.
+`fzf`, however, was literally born for jobs like this. __pick-git__ uses `fzf` to make working with branches, commits and files in your project's repo a breeze.
 
 It's installable via `pip` and works with Python 2/3.
 
@@ -19,7 +19,7 @@ pip install pick-git
 
 
 ## Dependencies
-- [pick](https://github.com/calleerlandsson/pick)
+- [fzf](https://github.com/junegunn/fzf)
 - [pyperclip](https://github.com/asweigart/pyperclip) (optional, and anyway it's automatically included if you install with `pip`)
 
 
@@ -34,7 +34,7 @@ I have `ghp` aliased to `pick-git --function commit`. The function argument is o
 
 `gd` is a shortcut I have that resolves to `git diff`. The `-b` flag allows me to pick both commits and compare them, instead of just picking one and comparing it with HEAD.
 
-At the end the final command that was invoked, `gd 28faaf7 4750072`, was printed to the console. I was able to find two commits and compare them very quickly and with very few keystrokes. __Even if these commits had been in a much bigger project and were months old__, pick's fuzzy select would have found them in no time as long as my commit messages were descriptive.
+At the end the final command that was invoked, `gd 28faaf7 4750072`, was printed to the console. I was able to find two commits and compare them very quickly and with very few keystrokes. __Even if these commits had been in a much bigger project and were months old__, fzf's fuzzy select would have found them in no time as long as my commit messages were descriptive.
 
 
 ### Shortcuts to pick-git Public Functions
@@ -92,7 +92,7 @@ Run `pick-git -h`.
 
 
 ## Contributing
-The "primitives" for the package are defined in `pick_git/core.py` and are listed below. These are the functions that actually invoke `pick`. If you think of other useful primitives please fork the repo and submit a pull request.
+The "primitives" for the package are defined in `pick_git/core.py` and are listed below. These are the functions that actually invoke `fzf`. If you think of other useful primitives please fork the repo and submit a pull request.
 
 - `pick_branch`
 - `pick_commit`
@@ -117,7 +117,3 @@ If anyone has ideas I'd love to hear them.
 
 ## License
 This code is licensed under the [MIT License](https://opensource.org/licenses/MIT).
-
-
-## Thanks
-To Calle Erlandsson and thoughtbot for writing pick =)

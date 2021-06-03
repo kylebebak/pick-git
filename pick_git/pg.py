@@ -5,9 +5,8 @@ from .helpers import PGPublicMethodMixin
 
 
 class PG(PGPublicMethodMixin):
-
-    def __init__(self, no_copy=False, shell='', rcfile='', **kwargs):
-        self.shell = shell or getenv('SHELL')
+    def __init__(self, no_copy=False, shell="", rcfile="", **kwargs):
+        self.shell = shell or getenv("SHELL")
         self.rcfile = rcfile
 
         self._copy = lambda text: None
@@ -16,7 +15,7 @@ class PG(PGPublicMethodMixin):
         try:  # import pyperclip if it's installed, use `pyperclip.copy` if it works
             import pyperclip
         except ImportError:
-            print('install pyperclip for a better experience')
+            print("install pyperclip for a better experience")
         else:
             try:
                 pyperclip.paste()
@@ -29,18 +28,18 @@ class PG(PGPublicMethodMixin):
         """Copy `s` using `_copy`, which is `pyperclip.copy`, or a NOOP if
         `pyperclip` doesn't work.
         """
-        self._copy(s.decode('utf-8') if type(s) is bytes else s)
+        self._copy(s.decode("utf-8") if type(s) is bytes else s)
 
     def execute(self, *commands):
         """Convert `commands` to a string, and execute them using the global
         `shell` var, the shell specified by the $SHELL env var, or by the default
         shell.
         """
-        commands = ' '.join(commands)
+        commands = " ".join(commands)
         print(commands)
-        rcfile = ['--rcfile', self.rcfile] if self.rcfile else []
+        rcfile = ["--rcfile", self.rcfile] if self.rcfile else []
         if self.shell:
-            p = Popen([self.shell] + rcfile + ['-i', '-c', commands])
+            p = Popen([self.shell] + rcfile + ["-i", "-c", commands])
             p.communicate()
         else:
             p = Popen(commands)

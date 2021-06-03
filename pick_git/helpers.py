@@ -1,4 +1,13 @@
-from .core import pick_branch, pick_tag, pick_commit, pick_commit_reflog, pick_modified_file, pick_file, cd_repository_root, current_branch
+from .core import (
+    cd_repository_root,
+    current_branch,
+    pick_branch,
+    pick_commit,
+    pick_commit_reflog,
+    pick_file,
+    pick_modified_file,
+    pick_tag,
+)
 
 
 class PGPublicMethodMixin(object):
@@ -10,23 +19,21 @@ class PGPublicMethodMixin(object):
         passes the git `entities` string, e.g. branches or commit hashes, to
         `args`.
         """
-        function = kwargs.get('function')
-        entities = [function(), function() if kwargs.pop('both', False) else None]
+        function = kwargs.get("function")
+        entities = [function(), function() if kwargs.pop("both", False) else None]
         if not entities[1]:
             entities.pop()
         if not args:
-            self.copy(' '.join(entities))
+            self.copy(" ".join(entities))
         else:
             self.execute(*(args + tuple(entities)))
 
     def branch(self, *args, **kwargs):
-        """Pick branch(es) and pass them to `args`, or copy branch names.
-        """
+        """Pick branch(es) and pass them to `args`, or copy branch names."""
         self._pick_both(*args, function=pick_branch, **kwargs)
 
     def tag(self, *args, **kwargs):
-        """Pick tag(s) and pass them to `args`, or copy tag names.
-        """
+        """Pick tag(s) and pass them to `args`, or copy tag names."""
         self._pick_both(*args, function=pick_tag, **kwargs)
 
     def commit(self, *args, **kwargs):
@@ -47,7 +54,7 @@ class PGPublicMethodMixin(object):
         commit.
         """
         cd_repository_root()
-        file = pick_modified_file('--staged') if kwargs.pop('staged', False) else pick_modified_file()
+        file = pick_modified_file("--staged") if kwargs.pop("staged", False) else pick_modified_file()
         if not args:
             self.copy(file)
         else:
@@ -61,16 +68,16 @@ class PGPublicMethodMixin(object):
         passes the string git `entities`, e.g. branches or commit hashes, to
         `args`.
         """
-        function = kwargs.get('function')
-        show = kwargs.pop('show', False)
+        function = kwargs.get("function")
+        show = kwargs.pop("show", False)
         cd_repository_root()
-        entities = [function(), function() if kwargs.pop('both', False) else 'HEAD']
-        self.copy(' '.join(entities))
+        entities = [function(), function() if kwargs.pop("both", False) else "HEAD"]
+        self.copy(" ".join(entities))
         file = pick_modified_file(*entities)
         if show:  # ugly syntax, but (a, b*, c) syntax isn't valid in python 2
-            self.execute(*('git', 'show') + args + ('{}:{}'.format(entities[0], file),))
+            self.execute(*("git", "show") + args + ("{}:{}".format(entities[0], file),))
         else:
-            self.execute(*('git', 'diff') + args + ('{} -- {} {}'.format(entities[0], entities[1], file),))
+            self.execute(*("git", "diff") + args + ("{} -- {} {}".format(entities[0], entities[1], file),))
 
     def branch_file(self, *args, **kwargs):
         """Pick branch(es), get list of files that are different in these
@@ -97,30 +104,29 @@ class PGPublicMethodMixin(object):
         """Find out how far ahead or behind `this` branch is compared with `that`. A
         `detailed` comparison shows all commits instead of just the commit count.
         """
-        both = kwargs.pop('both', False)
-        detailed = kwargs.pop('detailed', False)
+        both = kwargs.pop("both", False)
+        detailed = kwargs.pop("detailed", False)
         this = pick_branch() if both else current_branch()
         that = pick_branch()
         if detailed:
-            self.execute('git log --stat {that}..{this} && git log --stat {this}..{that}'.format(
-                    this=this, that=that))
+            self.execute("git log --stat {that}..{this} && git log --stat {this}..{that}".format(this=this, that=that))
         else:
-            self.execute('git rev-list --left-right --count {}...{}'.format(this, that))
+            self.execute("git rev-list --left-right --count {}...{}".format(this, that))
 
     def file_commit(self, *args, **kwargs):
         """Pick a file from index, and show all commits for this file. Pick a commit
         and diff file against HEAD or `show` it.
         """
-        show = kwargs.pop('show', False)
+        show = kwargs.pop("show", False)
         cd_repository_root()
         file = pick_file()
         self.copy(file)
-        commit = pick_commit('--follow', '--', file)
+        commit = pick_commit("--follow", "--", file)
         try:
             other_file = pick_modified_file(commit, raise_exception=True)
         except KeyboardInterrupt:
             other_file = file
         if show:
-            self.execute(*('git', 'show') + args + ('{}:{}'.format(commit, file),))
+            self.execute(*("git", "show") + args + ("{}:{}".format(commit, file),))
         else:
-            self.execute(*('git', 'diff') + args + ('{} -- {} {}'.format(commit, file, other_file),))
+            self.execute(*("git", "diff") + args + ("{} -- {} {}".format(commit, file, other_file),))
