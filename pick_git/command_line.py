@@ -5,7 +5,7 @@ import sys
 from .helpers import PGPublicMethodMixin
 from .pg import PG
 
-your_version = "2.0.0"
+your_version = "2.0.1"
 
 parser = argparse.ArgumentParser(description="Invoke a pick-git function.")
 
